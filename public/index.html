@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lairex Bot | Dashboard</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #0f0f13;
+      color: #e0e0e0;
+      min-height: 100vh;
+    }
+
+    /* Header */
+    header {
+      background: #1a1a24;
+      border-bottom: 1px solid #2a2a3a;
+      padding: 0 32px;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .header-left h1 {
+      font-size: 18px;
+      font-weight: 700;
+      color: #fff;
+    }
+    .status-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #555;
+    }
+    .status-dot.online { background: #43b581; box-shadow: 0 0 8px #43b581; }
+    .status-dot.offline { background: #f04747; }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+      color: #aaa;
+    }
+    .user-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: #5865F2;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      color: #fff;
+      overflow: hidden;
+    }
+    .user-avatar img { width: 100%; height: 100%; object-fit: cover; }
+    .btn-logout {
+      background: #2a2a3a;
+      color: #aaa;
+      border: 1px solid #3a3a4a;
+      border-radius: 8px;
+      padding: 6px 14px;
+      font-size: 13px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+    .btn-logout:hover { background: #f04747; color: #fff; border-color: #f04747; }
+
+    /* Main */
+    main { padding: 32px; max-width: 1200px; margin: 0 auto; }
+
+    .page-title {
+      font-size: 24px;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 24px;
+    }
+
+    /* Stats */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin-bottom: 32px;
+    }
+    .stat-card {
+      background: #1a1a24;
+      border: 1px solid #2a2a3a;
+      border-radius: 12px;
+      padding: 20px 24px;
+    }
+    .stat-label {
+      font-size: 13px;
+      color: #888;
+      margin-bottom: 8px;
+    }
+    .stat-value {
+      font-size: 28px;
+      font-weight: 700;
+      color: #fff;
+    }
+    .stat-icon {
+      font-size: 20px;
+      margin-bottom: 8px;
+    }
+    .stat-card.green { border-color: #43b58144; }
+    .stat-card.green .stat-value { color: #43b581; }
+    .stat-card.blue { border-color: #5865F244; }
+    .stat-card.blue .stat-value { color: #5865F2; }
+    .stat-card.yellow { border-color: #faa61a44; }
+    .stat-card.yellow .stat-value { color: #faa61a; }
+
+    /* Tickets */
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+    .section-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: #fff;
+    }
+    .badge {
+      background: #5865F2;
+      color: #fff;
+      border-radius: 20px;
+      padding: 2px 10px;
+      font-size: 12px;
+    }
+
+    .table-wrapper {
+      background: #1a1a24;
+      border: 1px solid #2a2a3a;
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    thead th {
+      background: #13131a;
+      padding: 14px 20px;
+      text-align: right;
+      font-size: 12px;
+      color: #666;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      border-bottom: 1px solid #2a2a3a;
+    }
+    tbody td {
+      padding: 14px 20px;
+      font-size: 14px;
+      border-bottom: 1px solid #1f1f2e;
+      vertical-align: middle;
+    }
+    tbody tr:last-child td { border-bottom: none; }
+    tbody tr:hover { background: #1f1f2e; }
+
+    .ticket-type {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #2a2a3a;
+      border-radius: 6px;
+      padding: 4px 10px;
+      font-size: 13px;
+    }
+    .status-badge {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    .status-badge.open { background: #43b58122; color: #43b581; border: 1px solid #43b58144; }
+    .status-badge.closed { background: #f0474722; color: #f04747; border: 1px solid #f0474744; }
+
+    .btn-close {
+      background: #f0474722;
+      color: #f04747;
+      border: 1px solid #f0474744;
+      border-radius: 8px;
+      padding: 6px 14px;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-close:hover { background: #f04747; color: #fff; }
+    .btn-close:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: #555;
+    }
+    .empty-state .icon { font-size: 48px; margin-bottom: 12px; }
+    .empty-state p { font-size: 15px; }
+
+    .loading { text-align: center; padding: 40px; color: #555; }
+
+    .footer-bar {
+      text-align: center;
+      padding: 24px;
+      color: #444;
+      font-size: 12px;
+      margin-top: 32px;
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #1a1a24;
+      border: 1px solid #2a2a3a;
+      border-radius: 10px;
+      padding: 12px 24px;
+      font-size: 14px;
+      display: none;
+      z-index: 1000;
+    }
+    .toast.show { display: block; }
+    .toast.success { border-color: #43b581; color: #43b581; }
+    .toast.error { border-color: #f04747; color: #f04747; }
+
+    @media (max-width: 768px) {
+      main { padding: 16px; }
+      header { padding: 0 16px; }
+      table { font-size: 13px; }
+      thead th, tbody td { padding: 10px 12px; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="header-left">
+    <div class="status-dot" id="statusDot"></div>
+    <h1>🤖 Lairex Bot Dashboard</h1>
+  </div>
+  <div class="header-right">
+    <div class="user-info">
+      <div class="user-avatar" id="userAvatar">?</div>
+      <span id="userName">...</span>
+    </div>
+    <a href="/logout" class="btn-logout">خروج</a>
+  </div>
+</header>
+
+<main>
+  <div class="page-title">لوحة التحكم</div>
+
+  <div class="stats-grid">
+    <div class="stat-card green">
+      <div class="stat-icon">🟢</div>
+      <div class="stat-label">حالة البوت</div>
+      <div class="stat-value" id="botStatus">...</div>
+    </div>
+    <div class="stat-card blue">
+      <div class="stat-icon">🎫</div>
+      <div class="stat-label">التكتات المفتوحة</div>
+      <div class="stat-value" id="openCount">-</div>
+    </div>
+    <div class="stat-card yellow">
+      <div class="stat-icon">📊</div>
+      <div class="stat-label">مجموع التكتات</div>
+      <div class="stat-value" id="totalCount">-</div>
+    </div>
+  </div>
+
+  <div class="section-header">
+    <div class="section-title">التكتات</div>
+    <span class="badge" id="ticketBadge">0</span>
+  </div>
+
+  <div class="table-wrapper">
+    <div class="loading" id="loading">⏳ جاري التحميل...</div>
+    <table id="ticketsTable" style="display:none">
+      <thead>
+        <tr>
+          <th>المستخدم</th>
+          <th>النوع</th>
+          <th>الحالة</th>
+          <th>التاريخ</th>
+          <th>أُغلق بواسطة</th>
+          <th>إجراء</th>
+        </tr>
+      </thead>
+      <tbody id="ticketsBody"></tbody>
+    </table>
+    <div class="empty-state" id="emptyState" style="display:none">
+      <div class="icon">🎫</div>
+      <p>ما في تكتات حالياً</p>
+    </div>
+  </div>
+</main>
+
+<div class="footer-bar">🔖 Bot made by Lairex</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  function showToast(msg, type = 'success') {
+    const toast = document.getElementById('toast');
+    toast.textContent = msg;
+    toast.className = `toast ${type} show`;
+    setTimeout(() => toast.className = 'toast', 3000);
+  }
+
+  function formatDate(iso) {
+    const d = new Date(iso);
+    return d.toLocaleDateString('ar-SA') + ' ' + d.toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit' });
+  }
+
+  async function loadUser() {
+    const res = await fetch('/api/me');
+    const user = await res.json();
+    document.getElementById('userName').textContent = user.username;
+    const avatarEl = document.getElementById('userAvatar');
+    if (user.avatar) {
+      avatarEl.innerHTML = `<img src="https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png" />`;
+    } else {
+      avatarEl.textContent = user.username[0].toUpperCase();
+    }
+  }
+
+  async function loadStatus() {
+    const res = await fetch('/api/status');
+    const data = await res.json();
+
+    const dot = document.getElementById('statusDot');
+    const statusEl = document.getElementById('botStatus');
+
+    if (data.online) {
+      dot.className = 'status-dot online';
+      statusEl.textContent = 'أونلاين';
+    } else {
+      dot.className = 'status-dot offline';
+      statusEl.textContent = 'أوفلاين';
+    }
+
+    document.getElementById('openCount').textContent = data.openTickets;
+    document.getElementById('totalCount').textContent = data.totalTickets;
+  }
+
+  async function loadTickets() {
+    const res = await fetch('/api/tickets');
+    const tickets = await res.json();
+
+    document.getElementById('loading').style.display = 'none';
+    document.getElementById('ticketBadge').textContent = tickets.length;
+
+    if (tickets.length === 0) {
+      document.getElementById('emptyState').style.display = 'block';
+      return;
+    }
+
+    document.getElementById('ticketsTable').style.display = 'table';
+    const tbody = document.getElementById('ticketsBody');
+    tbody.innerHTML = '';
+
+    tickets.forEach(ticket => {
+      const isClosed = ticket.status === 'closed';
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td><strong>@${ticket.username}</strong></td>
+        <td><span class="ticket-type">${ticket.emoji} ${ticket.type}</span></td>
+        <td><span class="status-badge ${ticket.status}">${isClosed ? '🔒 مغلق' : '🟢 مفتوح'}</span></td>
+        <td>${formatDate(ticket.createdAt)}</td>
+        <td>${ticket.closedBy ? ticket.closedBy : '-'}</td>
+        <td>
+          <button
+            class="btn-close"
+            onclick="closeTicket('${ticket.channelId}', this)"
+            ${isClosed ? 'disabled' : ''}
+          >
+            ${isClosed ? 'مغلق' : '🔒 إغلاق'}
+          </button>
+        </td>
+      `;
+      tbody.appendChild(tr);
+    });
+  }
+
+  async function closeTicket(channelId, btn) {
+    btn.disabled = true;
+    btn.textContent = '⏳';
+
+    const res = await fetch(`/api/tickets/${channelId}/close`, { method: 'POST' });
+    const data = await res.json();
+
+    if (data.success) {
+      showToast('✅ تم إغلاق التكت بنجاح');
+      await loadTickets();
+      await loadStatus();
+    } else {
+      showToast('❌ ' + (data.error || 'صار خطأ'), 'error');
+      btn.disabled = false;
+      btn.textContent = '🔒 إغلاق';
+    }
+  }
+
+  async function init() {
+    await Promise.all([loadUser(), loadStatus(), loadTickets()]);
+  }
+
+  init();
+  setInterval(() => { loadStatus(); loadTickets(); }, 10000);
+</script>
+</body>
+</html>
